@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Google sign-in and API credentials
+.clasprc.json
+creds.json
+credentials*.json
+client_secret*.json
+token*.json
+
+# Local secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Exports of the trip planner, which hold personal data
+*.xlsx
+*.csv
+
+# macOS
+.DS_Store

@@ -1,0 +1,16 @@
+{
+  "name": "expenses-bot",
+  "version": "0.1.0",
+  "description": "Telegram bot that logs travel expenses to the Budget Tracker tab of a Google Sheet",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "@google/clasp": "^3.4.1"
+  }
+}
