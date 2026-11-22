@@ -262,3 +262,7 @@ npm test
 You can also edit locally and upload with [clasp](https://github.com/google/clasp), Google's command line tool for Apps Script. [doc.md](doc.md) explains the architecture, each file, the clasp setup and how to maintain the project.
 
 The bot token, webhook secret, Telegram user ID and spreadsheet ID belong in the script's Script Properties. Never add them to the code or this repository.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

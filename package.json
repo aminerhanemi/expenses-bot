@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Telegram bot that logs travel expenses to the Budget Tracker tab of a Google Sheet",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "engines": {
     "node": ">=20"
   },
