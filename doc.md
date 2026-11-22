@@ -112,7 +112,7 @@ All files share one global scope, with no imports. Functions can call each other
 | `settings.js` | Creates, reads and writes the `Bot Settings` tab | `ensureBotSettings_`, `readBotSettings_`, `writeBotSettings_` |
 | `telegram.js` | Calls the Telegram API, and removes the token from error messages | `callTelegram_`, `sendMessage_` |
 | `timezones.js` | Maps a country name to its main time zone | `timeZoneForCountry_` |
-| `setup.js` | Functions you run by hand from the editor. Holds the deployment ID | `setup`, `checkWebhook` |
+| `setup.js` | Functions you run by hand from the editor | `setup`, `checkWebhook` |
 | `appsscript.json` | Apps Script manifest: time zone, permissions, web app access | |
 
 ### `test/`: tests that run on your computer
@@ -140,6 +140,7 @@ Node doesn't have Apps Script's services, so each test loads the source file wit
 | `WEBHOOK_SECRET` | You | Random string of letters, digits, `_` and `-` |
 | `OWNER_USER_ID` | You | Your numeric Telegram user ID |
 | `SHEET_ID` | You | The spreadsheet ID, from its URL |
+| `DEPLOYMENT_ID` | You | The web app's deployment ID. `setup` builds the webhook URL from it. It's kept out of the code because it's the bot's public address |
 | `PROCESSED_UPDATE_IDS` | Bot | The last 200 handled update IDs, for duplicate protection |
 | `LAST_BOT_EXPENSE` | Bot | The row and contents of the last expense, for `/undo` |
 
@@ -221,13 +222,9 @@ npx clasp push --force
 npx clasp create-deployment --description "First version"
 ```
 
-Copy the deployment ID it prints into `DEPLOYMENT_ID` in `src/setup.js`, then push again:
+Keep the deployment ID it prints for the next step.
 
-```bash
-npx clasp push --force
-```
-
-**5. Configure.** In the Apps Script editor, add `BOT_TOKEN`, `WEBHOOK_SECRET`, `OWNER_USER_ID` and `SHEET_ID` to Script Properties.
+**5. Configure.** In the Apps Script editor, add `BOT_TOKEN`, `WEBHOOK_SECRET`, `OWNER_USER_ID`, `SHEET_ID` and `DEPLOYMENT_ID` to Script Properties.
 
 **6. Connect.** In the editor, run `setup` and approve the permissions. Its log should name your bot and spreadsheet. Then send your bot `/help`.
 
@@ -262,6 +259,7 @@ npx clasp update-deployment <deployment ID> --description "What changed"
 | Change how the log grows | Change `MIN_EMPTY_LOG_ROWS` or `LOG_GROWTH_ROWS` in `src/tracker.js` |
 | Change the home currency | EUR is built in: search for `EUR` in `src/`, including the `Amount (EUR)` header, and update the tests and sheet too |
 | Move to another spreadsheet | Change `SHEET_ID`, then run `setup` |
+| Move the bot to a new web address | Run `create-deployment`, put the new ID in `DEPLOYMENT_ID`, and run `setup`. Once the bot replies, remove the old one with `npx clasp delete-deployment <old ID>` |
 | Replace the bot token or webhook secret | Change the property, then run `setup` to register the webhook again. A leaked token must also be revoked in @BotFather |
 
 `DEFAULT_CATEGORY_CODES` in `src/parser.js` only fills a new `Bot Settings` tab. Changing it doesn't affect a tab that already exists.

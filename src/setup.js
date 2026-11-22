@@ -1,13 +1,14 @@
-const DEPLOYMENT_ID = 'AKfycbwp14b_vIdwX8OYRS5qjm3Q95MD1aoUnPXHu4DKyhhhBMuqDQFrTlAjtPBO0PGi2tbSVg';
-
 // Run from the Apps Script editor. Checks the Script Properties, then connects the bot to Telegram.
 function setup() {
   const config = getConfig_();
+  // Kept out of the code, since it's the bot's web address and the code is public.
+  const deploymentId = (PropertiesService.getScriptProperties().getProperty('DEPLOYMENT_ID') || '').trim();
   const missing = [
     ['BOT_TOKEN', config.botToken],
     ['WEBHOOK_SECRET', config.webhookSecret],
     ['OWNER_USER_ID', config.ownerUserId],
     ['SHEET_ID', config.sheetId],
+    ['DEPLOYMENT_ID', deploymentId],
   ].filter((entry) => !entry[1]).map((entry) => entry[0]);
   if (missing.length) {
     throw new Error('Missing Script Properties: ' + missing.join(', '));
@@ -18,6 +19,9 @@ function setup() {
   if (!/^[A-Za-z0-9_-]+$/.test(config.webhookSecret)) {
     throw new Error('WEBHOOK_SECRET may only contain letters, digits, _ and -');
   }
+  if (!/^[A-Za-z0-9_-]+$/.test(deploymentId)) {
+    throw new Error('DEPLOYMENT_ID may only contain letters, digits, _ and -');
+  }
 
   const bot = callTelegram_(config.botToken, 'getMe', {});
   console.log('Bot: @' + bot.username);
@@ -26,7 +30,7 @@ function setup() {
   const created = ensureBotSettings_(spreadsheet);
   console.log(BOT_SETTINGS_SHEET + ' tab: ' + (created ? 'created' : 'already there, left unchanged'));
 
-  const url = 'https://script.google.com/macros/s/' + DEPLOYMENT_ID + '/exec?secret=' + config.webhookSecret;
+  const url = 'https://script.google.com/macros/s/' + deploymentId + '/exec?secret=' + config.webhookSecret;
   callTelegram_(config.botToken, 'setWebhook', {
     url: url,
     allowed_updates: ['message'],

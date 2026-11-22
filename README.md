@@ -66,7 +66,7 @@ After setup, you can change these codes in the `Bot Settings` tab of your sheet.
 
 This takes about 30 minutes and needs no programming. You only need a Google account, the Telegram app, and a computer with a web browser. You'll copy and paste text, and click buttons in Google's websites.
 
-Keep a blank note open while you go. You'll collect four values in it:
+Keep a blank note open while you go. You'll collect five values in it:
 
 | Value | What it is |
 |---|---|
@@ -74,6 +74,7 @@ Keep a blank note open while you go. You'll collect four values in it:
 | Your Telegram ID | A number that tells the bot who you are |
 | Secret word | A random word you make up. Keep it private |
 | Sheet ID | Tells the bot which spreadsheet to write to |
+| Deployment ID | Your script's web address, so Telegram knows where to send your messages |
 
 ### Step 1: Create your bot in Telegram
 
@@ -161,28 +162,16 @@ When you're done, click the **Save** icon, which looks like a floppy disk, above
    - **Who has access:** **Anyone**
 4. Click **Deploy**.
 5. Google asks you to authorize access. Click **Authorize access**, choose your Google account, and follow the step in **About the "unsafe" warning** below.
-6. You'll then see a **Deployment ID**, a long code starting with `AKfycb`. Click **Copy**, then **Done**.
+6. You'll then see a **Deployment ID**, a long code starting with `AKfycb`. Click **Copy**, paste it into your note as your **Deployment ID**, then click **Done**.
 
 **About the "unsafe" warning:** Google shows "Google hasn't verified this app", because the script is yours rather than a published app. Click **Advanced**, then **Go to Expenses bot (unsafe)**, then **Allow**. This lets your own script edit your own spreadsheets and send messages to Telegram, and nobody else gets access.
 
 "Anyone" means Telegram can deliver your messages to the script without signing in to Google. It doesn't give anyone access to your sheet: the script ignores every message without your secret word, or from a Telegram ID that isn't yours.
 
-### Step 8: Put the deployment ID into the code
-
-1. Open the **setup.gs** file.
-2. The first line looks like this:
-
-   ```js
-   const DEPLOYMENT_ID = 'AKfycbwp14b_...';
-   ```
-
-3. Replace the code between the two `'` quote marks with your own deployment ID from step 7. Keep the quote marks.
-4. Click **Save**.
-
-### Step 9: Enter your four values
+### Step 8: Enter your five values
 
 1. Click the **gear icon**, labelled **Project Settings**, and scroll down to **Script Properties**.
-2. Click **Add script property** four times, and fill in these names and values from your note. The names must be in capitals, exactly as shown:
+2. Click **Add script property** five times, and fill in these names and values from your note. The names must be in capitals, exactly as shown:
 
    | Property | Value |
    |---|---|
@@ -190,12 +179,13 @@ When you're done, click the **Save** icon, which looks like a floppy disk, above
    | `OWNER_USER_ID` | Your Telegram ID |
    | `WEBHOOK_SECRET` | Your secret word |
    | `SHEET_ID` | Your Sheet ID |
+   | `DEPLOYMENT_ID` | Your Deployment ID |
 
 3. Click **Save script properties**.
 
 Because these values live here and not in the code, the code can be shared without giving anyone your bot.
 
-### Step 10: Connect the bot
+### Step 9: Connect the bot
 
 1. Click the **< >** icon, labelled **Editor**, and open **setup.gs**.
 2. Above the code, there's a menu showing a function name. Choose **setup** in it.
@@ -208,7 +198,7 @@ Because these values live here and not in the code, the code can be shared witho
 
 Your sheet now has a new tab called **Bot Settings**, holding your settings and category codes.
 
-### Step 11: Try it
+### Step 10: Try it
 
 In Telegram, open the chat with your bot, using the username you chose in step 1, and tap **Start**. You should get the list of commands. Then send, with your own values:
 
@@ -227,8 +217,8 @@ You're done, so you can delete your note now. If you need the values again, they
 
 | What happens | What to do |
 |---|---|
-| The bot doesn't reply at all | In the script editor, choose **checkWebhook** in the function menu, click **Run**, and read the log. Then check the four Script Properties for typos, and run **setup** again |
-| `setup` says "Missing Script Properties" | One of the four names is missing or misspelled. They must be in capitals, as in step 9 |
+| The bot doesn't reply at all | In the script editor, choose **checkWebhook** in the function menu, click **Run**, and read the log. Then check the five Script Properties for typos, and run **setup** again |
+| `setup` says "Missing Script Properties" | One of the five names is missing or misspelled. They must be in capitals, as in step 8 |
 | `setup` says `OWNER_USER_ID must contain digits only` | Your Telegram ID should be only a number, with no spaces |
 | `setup` fails and mentions the token | The bot token was copied incompletely. Copy it again from BotFather |
 | The bot replies "Not saved: something went wrong on my side" | Check the tab is called exactly `Budget Tracker`, the eight headings are spelled exactly as in step 4, and G202 still has the total. The **Executions** page, under the list icon on the left, shows the exact error |
