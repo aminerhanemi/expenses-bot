@@ -63,6 +63,7 @@ function readLogExpenses_(spreadsheet) {
       day: Utilities.formatDate(row[column('Date')], zone, 'yyyy-MM-dd'),
       amount: numberOrNull(row[column('Local Amount')]),
       currency: String(row[column('Currency')]).trim(),
+      category: String(row[column('Category')]).trim(),
       amountEur: numberOrNull(row[column('Amount (EUR)')]),
     }));
 }

@@ -321,9 +321,9 @@ test('expenses are read with their day in the sheet time zone', () => {
   const { readLogExpenses_ } = load(tracker);
   const day = 'day-in-America/Los_Angeles-yyyy-MM-dd';
   assert.deepEqual(readLogExpenses_(spreadsheet(tracker)), [
-    { day, amount: 10, currency: 'PEN', amountEur: 2.5 },
-    { day, amount: null, currency: '', amountEur: 45.95 },
-    { day, amount: 10, currency: 'PEN', amountEur: null },
+    { day, amount: 10, currency: 'PEN', category: 'Food & Drink', amountEur: 2.5 },
+    { day, amount: null, currency: '', category: 'Accommodation', amountEur: 45.95 },
+    { day, amount: 10, currency: 'PEN', category: 'Food & Drink', amountEur: null },
   ]);
 });
 

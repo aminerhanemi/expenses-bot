@@ -30,7 +30,7 @@ The sheet's own formulas then update its totals. The bot only adds rows, and has
 | `/currency <code> <rate>` | Sets the currency and how much of it 1 EUR buys. EUR needs no rate |
 | `/undo` | Removes the last expense the bot added, once |
 | `/day` | Shows what you spent today: a total for each local currency, and one in EUR |
-| `/month` | Shows the same for the current calendar month |
+| `/month` | Shows the same for the current calendar month, then each category's EUR total and share, biggest first |
 | `/help`, `/start` | Show the commands, current settings and category codes |
 
 ## Architecture
@@ -170,7 +170,7 @@ Node doesn't have Apps Script's services, so each test loads the source file wit
 
 **`/undo`.** It clears the row only if columns B to F still match what the bot wrote, since a row added or removed by hand changes row numbers. It goes back one expense only.
 
-**`/day`, `/month` and the "Today:" line.** These only read the sheet, and share the same adding up (`spendingTotals_`). They add up log rows whose date falls in the current day or calendar month, using the current time zone to decide what "today" is. `/month` uses calendar months on purpose, so its total differs from the Monthly Budget tab, whose periods run from the 17th to the 16th. Amounts in different currencies can't be added together, so each currency gets its own line, and the EUR total comes from column G, so it uses each row's own rate. Rows with no real date in column A can't be placed in a period and are left out, and a row with no EUR amount is counted in the reply's warning line rather than the total.
+**`/day`, `/month` and the "Today:" line.** These only read the sheet, and share the same adding up (`spendingTotals_`). They add up log rows whose date falls in the current day or calendar month, using the current time zone to decide what "today" is. `/month` uses calendar months on purpose, so its total differs from the Monthly Budget tab, whose periods run from the 17th to the 16th. Amounts in different currencies can't be added together, so each currency gets its own line, and the EUR total comes from column G, so it uses each row's own rate. Rows with no real date in column A can't be placed in a period and are left out, and a row with no EUR amount is counted in the reply's warning line rather than the total. `/month` then adds `categoryBreakdown_`: each category's total in EUR only, since one category can mix currencies, sorted biggest first with its rounded share, so the percentages may not add up to exactly 100. Rows with no category appear as "No category".
 
 **Amounts.** A separator followed by exactly three digits means thousands, so `12.500` is 12,500. Anything that could be read two ways, such as `1234.567`, is rejected. A rate with exactly three decimals is rejected for the same reason.
 

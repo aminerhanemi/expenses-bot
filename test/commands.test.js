@@ -271,7 +271,7 @@ test('/help and /start show the commands, settings and codes', () => {
 });
 
 const NOV_6 = Date.UTC(2026, 10, 6, 12) / 1000;
-const expense = (day, amount, currency, amountEur) => ({ day, amount, currency, amountEur });
+const expense = (day, amount, currency, amountEur, category = 'Food & Drink') => ({ day, amount, currency, amountEur, category });
 
 test('/day totals only today, in local currency and EUR', () => {
   const logRows = [
@@ -294,7 +294,7 @@ test('/month totals the whole month, with one line per currency', () => {
     expense('2025-11-06', 999, 'BOB', 75),
   ];
   const { send } = simulate({ settings: ready, logRows });
-  assert.equal(send('/month', NOV_6), 'This month, 2026-11 (4 expenses):\n30 PEN\n30 BOB\n5 EUR\nTotal: 14,70 EUR');
+  assert.equal(send('/month', NOV_6), 'This month, 2026-11 (4 expenses):\n30 PEN\n30 BOB\n5 EUR\nTotal: 14,70 EUR\n\nBy category:\nFood & Drink: 14,70 EUR (100%)');
 });
 
 test('"today" follows the current time zone', () => {
@@ -383,4 +383,47 @@ test('an undo note and today both fit in the saved reply', () => {
   const { send } = simulate({ settings: ready, propertyWriteFails: true });
   const reply = send('14 f', NOV_6);
   assert.match(reply, /fix it in the sheet if needed\.\nToday: 14 BOB = 1,05 EUR \(1 expense\)$/);
+});
+
+test('/month lists each category in EUR, biggest first, with its share', () => {
+  const logRows = [
+    expense('2026-11-02', 100, 'BOB', 7.52, 'Food & Drink'),
+    expense('2026-11-03', 650, 'BOB', 48.87, 'Accommodation'),
+    expense('2026-11-04', 30000, 'CLP', 31.25, 'Accommodation'),
+    expense('2026-11-05', 2000, 'CLP', 0.3, 'ATM fees'),
+    expense('2026-11-06', 50, 'BOB', 3.76, 'Local Transport'),
+  ];
+  const { send } = simulate({ settings: ready, logRows });
+  const reply = send('/month', NOV_6);
+  assert.equal(reply.split('\n\n')[1], [
+    'By category:',
+    'Accommodation: 80,12 EUR (87%)',
+    'Food & Drink: 7,52 EUR (8%)',
+    'Local Transport: 3,76 EUR (4%)',
+    'ATM fees: 0,30 EUR (<1%)',
+  ].join('\n'));
+});
+
+test('/month puts rows with no category under their own line and leaves out rows with no EUR amount', () => {
+  const logRows = [
+    expense('2026-11-02', 10, 'BOB', 3, ''),
+    expense('2026-11-03', 10, 'BOB', 1, 'Food & Drink'),
+    expense('2026-11-04', 10, 'BOB', null, 'Accommodation'),
+  ];
+  const { send } = simulate({ settings: ready, logRows });
+  const reply = send('/month', NOV_6);
+  assert.match(reply, /By category:\nNo category: 3,00 EUR \(75%\)\nFood & Drink: 1,00 EUR \(25%\)$/);
+  assert.doesNotMatch(reply, /Accommodation/);
+});
+
+test('/month with nothing spent has no category section, and /day never has one', () => {
+  const empty = simulate({ settings: ready });
+  assert.equal(empty.send('/month', NOV_6), 'This month, 2026-11: no expenses.');
+  const { send } = simulate({ settings: ready, logRows: [expense('2026-11-06', 14, 'BOB', 1.05)] });
+  assert.doesNotMatch(send('/day', NOV_6), /By category/);
+});
+
+test('saved replies stay unchanged by the category breakdown', () => {
+  const { send } = simulate({ settings: ready });
+  assert.doesNotMatch(send('14 f', NOV_6), /By category/);
 });

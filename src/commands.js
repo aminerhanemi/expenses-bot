@@ -26,9 +26,9 @@ function handleMessage_(config, message) {
     case 'undo':
       return undoLastExpense_(spreadsheet);
     case 'day':
-      return spendingReply_(spreadsheet, settings, message, 'Today', 'yyyy-MM-dd');
+      return spendingReply_(spreadsheet, settings, message, 'Today', 'yyyy-MM-dd', false);
     case 'month':
-      return spendingReply_(spreadsheet, settings, message, 'This month', 'yyyy-MM');
+      return spendingReply_(spreadsheet, settings, message, 'This month', 'yyyy-MM', true);
     default:
       return helpText_(settings);
   }
@@ -155,9 +155,34 @@ function readLastExpense_(props) {
   }
 }
 
-function spendingReply_(spreadsheet, settings, message, label, periodFormat) {
+function spendingReply_(spreadsheet, settings, message, label, periodFormat, byCategory) {
   const period = Utilities.formatDate(new Date(message.date * 1000), currentTimeZone_(settings), periodFormat);
-  return spendingSummary_(label + ', ' + period, rowsInPeriod_(spreadsheet, period));
+  const rows = rowsInPeriod_(spreadsheet, period);
+  const summary = spendingSummary_(label + ', ' + period, rows);
+  return byCategory && rows.length ? summary + '\n\n' + categoryBreakdown_(rows) : summary;
+}
+
+// In EUR only, since one category can mix currencies. Biggest first, with each one's share of the total.
+function categoryBreakdown_(rows) {
+  const totals = new Map();
+  rows.filter((row) => row.amountEur !== null).forEach((row) => {
+    const category = row.category || 'No category';
+    totals.set(category, (totals.get(category) || 0) + row.amountEur);
+  });
+  const grandTotal = Array.from(totals.values()).reduce((sum, value) => sum + value, 0);
+
+  const lines = Array.from(totals.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([category, total]) => category + ': ' + formatEur_(total) + ' EUR' + shareOf_(total, grandTotal));
+  return ['By category:'].concat(lines).join('\n');
+}
+
+function shareOf_(value, total) {
+  if (total <= 0) {
+    return '';
+  }
+  const percent = Math.round((value / total) * 100);
+  return percent === 0 && value > 0 ? ' (<1%)' : ' (' + percent + '%)';
 }
 
 function rowsInPeriod_(spreadsheet, period) {

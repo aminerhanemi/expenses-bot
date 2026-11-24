@@ -35,7 +35,7 @@ Today: 14 BOB = 1,05 EUR (1 expense)
 | `/currency EUR` | Sets the currency to euros, which needs no rate |
 | `/undo` | Removes the last expense the bot added |
 | `/day` | Shows what you spent today |
-| `/month` | Shows what you spent this calendar month |
+| `/month` | Shows what you spent this calendar month, with a total for each category |
 | `/help` | Shows the commands, your current settings and the category codes |
 
 **Category codes**
